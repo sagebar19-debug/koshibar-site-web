@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGE TUN - PANEL ADMIN & REVENDEUR</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0B0E14;
+            --card-bg: rgba(22, 27, 38, 0.85);
+            --border-color: rgba(0, 242, 254, 0.2);
+            --primary-neon: #00f2fe;
+            --secondary-neon: #4facfe;
+            --accent-purple: #7f00ff;
+            --accent-pink: #ff007f;
+            --text-main: #FFFFFF;
+            --text-muted: #A0AEC0;
+            --success-color: #00e676;
+            --danger-color: #ff1744;
+            --warning-color: #ffea00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.08) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Neon Animé */
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .animated-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #00f2fe, #4facfe, #ff007f, #7f00ff, #00f2fe);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 6s ease infinite;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar Navigation */
+        sidebar {
+            width: 280px;
+            background: rgba(15, 20, 30, 0.8);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            padding: 14px 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: #fff;
+            background: rgba(0, 242, 254, 0.08);
+            border-left-color: var(--primary-neon);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        /* Zones de Contenu */
+        main {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cartes & Panneaux */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(8px);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary-neon);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+        }
+
+        /* Formulaires & Inputs */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            font-family: monospace;
+        }
+
+        /* Boutons Neon */
+        .btn {
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon));
+            color: #000;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff1744, #ff5252);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffea00, #ffae00);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255, 234, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Modal de Connexion */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 14, 20, 0.95);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 242, 254, 0.2);
+        }
+
+        /* Cartes de Résultat Formatées (Ticket / Output) */
+        .ticket-box {
+            background: #000;
+            border: 1px dashed var(--primary-neon);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: var(--primary-neon);
+            margin-top: 15px;
+            position: relative;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-neon);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Tableaux de données */
+        .data-table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--primary-neon);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(0, 230, 118, 0.15); color: var(--success-color); border: 1px solid var(--success-color); }
+        .badge-danger { background: rgba(255, 23, 68, 0.15); color: var(--danger-color); border: 1px solid var(--danger-color); }
+
+        /* Cartes de statistiques (Go) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--primary-neon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-val {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .stat-lbl {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MODAL AUTHENTIFICATION -->
+    <div id="loginModal" class="login-overlay">
+        <div class="login-card">
+            <h2 class="animated-title" style="justify-content: center; margin-bottom: 20px;">SAGE TUN</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Accès restreint aux administrateurs & revendeurs</p>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <input type="text" id="loginId" class="form-control" placeholder="ID d'accès (ex: ADMIN ou SAGE-XXXX)" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <input type="password" id="loginPass" class="form-control" placeholder="Mot de passe" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Se Connecter <i class="fas fa-sign-in-alt"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="animated-title">
+            <i class="fas fa-shield-halved"></i>
+            <span id="panelHeaderTitle">SAGE TUN GRANDE PANEL</span>
+        </div>
+        <div class="user-badge">
+            <i class="fas fa-user-circle" style="color: var(--primary-neon);"></i>
+            <span id="currentUserRole">Utilisateur</span>
+            <button onclick="logout()" class="btn btn-secondary" style="padding: 4px 10px; margin-left: 10px; font-size: 0.75rem;"><i class="fas fa-power-off"></i></button>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- NAVIGATION -->
+        <sidebar>
+            <div class="nav-item active admin-only" onclick="switchTab('tab-config')">
+                <i class="fas fa-server"></i> 💻 Config Serveurs
+            </div>
+            <div class="nav-item" onclick="switchTab('tab-create-token')">
+                <i class="fas fa-ticket-alt"></i> 🎟️ Créer un Jeton
+            </div>
+            <div class="nav-item" onclick="switchTab('tab-public-token')">
+                <i class="fas fa-globe"></i> 🌍 Jetons Publics
+            </div>
+            <div class="nav-item admin-only" onclick="switchTab('tab-create-reseller')">
+                <i class="fas fa-user-plus"></i> 👤 Créer Revendeur
+            </div>
+            <div class="nav-item admin-only" onclick="switchTab('tab-manage-resellers')">
+                <i class="fas fa-users-cog"></i> 👤👁️ Gérer Revendeurs
+            </div>
+            <div class="nav-item" onclick="switchTab('tab-manage-tokens')">
+                <i class="fas fa-list-check"></i> 🎟️👁️ Voir Mes Jetons
+            </div>
+            <div class="nav-item admin-only" onclick="switchTab('tab-stats')">
+                <i class="fas fa-chart-line"></i> 🚀👁️ Consommation Go
+            </div>
+        </sidebar>
+
+        <!-- MAIN CONTENT -->
+        <main>
+
+            <!-- 1. CONFIGURATION DES SERVEURS (ADMIN) -->
+            <div id="tab-config" class="tab-content active">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-terminal"></i> 🔥 Configuration SSH</div>
+                    <form onsubmit="saveSshConfig(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Type de Tunnel SSH</label>
+                                <select id="sshType" class="form-control">
+                                    <option value="SSH-TLS-PAYLOAD">1: SSH-TLS-PAYLOAD</option>
+                                    <option value="SSH-DIRECT">2: SSH-DIRECT</option>
+                                    <option value="SSH-PROXY">3: SSH-PROXY</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>1: NOM</label><input type="text" id="sshName" class="form-control" placeholder="Nom du serveur" required></div>
+                            <div class="form-group"><label>2: PASS</label><input type="password" id="sshPass" class="form-control" placeholder="Mot de passe SSH"></div>
+                            <div class="form-group"><label>3: HOST SSH</label><input type="text" id="sshHost" class="form-control" placeholder="ex: ssh.sagetun.net" required></div>
+                            <div class="form-group"><label>4: PORT SSH</label><input type="text" id="sshPort" class="form-control" value="22"></div>
+                            <div class="form-group"><label>5: UDPGW PORT</label><input type="text" id="sshUdpgwPort" class="form-control" value="7300"></div>
+                            <div class="form-group"><label>7: PAYLOAD</label><input type="text" id="sshPayload" class="form-control" placeholder="GET / HTTP/1.1[crlf]Host: ..."></div>
+                            <div class="form-group"><label>8: PROXY IP:PORT</label><input type="text" id="sshProxy" class="form-control" placeholder="104.16.51.1:8080"></div>
+                            <div class="form-group"><label>9: SERVEURS NAME INDICATIONS (SNI)</label><input type="text" id="sshSni" class="form-control" placeholder="cdn.cloudflare.com"></div>
+                            <div class="form-group"><label>10: DNS</label><input type="text" id="sshDns" class="form-control" value="1.1.1.1:1.0.0.1"></div>
+                            <div class="form-group"><label>11: UDPGW</label><input type="text" id="sshUdpgw" class="form-control" value="127.0.0.1:7300"></div>
+                            <div class="form-group"><label>11: FORCING TLS</label>
+                                <select id="sshTls" class="form-control">
+                                    <option value="TLS AUTO">TLS AUTO</option>
+                                    <option value="TLSv1">TLSv1</option>
+                                    <option value="TLSv1.1">TLSv1.1</option>
+                                    <option value="TLSv1.2" selected>TLSv1.2</option>
+                                    <option value="TLSv1.3">TLSv1.3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px; flex-direction: row; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="sshAutoPing" checked style="width: 18px; height: 18px;">
+                            <label style="margin: 0;">12: AUTO PING (PINGER FOR KEEP-ALIVE SERVICE)</label>
+                        </div>
+                        <button type="submit" class="btn" style="margin-top: 20px;"><i class="fas fa-save"></i> Enregistrer Config SSH</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-tint"></i> 💧 Configuration V2RAY</div>
+                    <form onsubmit="saveV2rayConfig(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>V2RAY Type de Tunnel</label>
+                                <select id="v2rayType" class="form-control">
+                                    <option value="VLESS">1: VLESS</option>
+                                    <option value="VMESS">2: VMESS</option>
+                                    <option value="TROJAN">3: TROJAN</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Modification apportée au JSON V2Ray (Conservée lors des envois) :</label>
+                            <textarea id="v2rayJson" class="form-control" placeholder="Collez votre configuration JSON V2Ray ici...">{
+  "inbounds": [],
+  "outbounds": [{ "protocol": "vless", "settings": {} }]
+}</textarea>
+                        </div>
+                        <button type="submit" class="btn" style="margin-top: 20px;"><i class="fas fa-save"></i> Enregistrer Config V2Ray</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 2. CRÉER UN JETON -->
+            <div id="tab-create-token" class="tab-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-ticket-alt"></i> 🎟️ Créer un Jeton Privé</div>
+                    <div id="resellerQuotaBadge" style="margin-bottom: 15px; font-weight: 600; color: var(--primary-neon);"></div>
+                    <form onsubmit="generatePrivateToken(event)">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Durée de validité</label>
+                            <select id="tokenDuration" class="form-control">
+                                <option value="7">7 Jours</option>
+                                <option value="31">31 Jours</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn"><i class="fas fa-plus-circle"></i> Créer le Jeton</button>
+                    </form>
+
+                    <div id="tokenOutput" style="display: none;">
+                        <div class="ticket-box" id="ticketBoxText"></div>
+                        <button onclick="copyTicket()" class="btn btn-secondary" style="margin-top: 10px;"><i class="fas fa-copy"></i> Copier le résultat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. JETONS PUBLICS -->
+            <div id="tab-public-token" class="tab-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-globe"></i> 🌍 Créer un Jeton Public (Test <= 24h)</div>
+                    <form onsubmit="generatePublicToken(event)">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Durée de validité (Heures - Max 24h)</label>
+                            <input type="number" id="publicHours" class="form-control" min="1" max="24" value="12" required>
+                        </div>
+                        <button type="submit" class="btn"><i class="fas fa-broadcast-tower"></i> Générer Jeton Public</button>
+                    </form>
+
+                    <div id="publicTokenOutput" style="display: none;">
+                        <div class="ticket-box" id="publicTicketBoxText"></div>
+                        <button onclick="copyPublicTicket()" class="btn btn-secondary" style="margin-top: 10px;"><i class="fas fa-copy"></i> Copier le résultat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. CRÉER UN REVENDEUR (ADMIN) -->
+            <div id="tab-create-reseller" class="tab-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-user-plus"></i> 👤 Créer un Revendeur</div>
+                    <form onsubmit="createReseller(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Mot de passe du revendeur</label>
+                                <input type="password" id="resellerPass" class="form-control" required placeholder="Mot de passe d'accès">
+                            </div>
+                            <div class="form-group">
+                                <label>Limite de Jetons (Crédits)</label>
+                                <input type="number" id="resellerTokenLimit" class="form-control" value="20" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Limite de Jours (Validité du compte)</label>
+                                <input type="number" id="resellerDaysLimit" class="form-control" value="30" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" style="margin-top: 20px;"><i class="fas fa-user-check"></i> Générer Compte Revendeur</button>
+                    </form>
+
+                    <div id="resellerOutput" style="display: none;">
+                        <div class="ticket-box" id="resellerTicketText"></div>
+                        <button onclick="copyResellerTicket()" class="btn btn-secondary" style="margin-top: 10px;"><i class="fas fa-copy"></i> Copier la fiche Revendeur</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. GÉRER LES REVENDEURS (ADMIN) -->
+            <div id="tab-manage-resellers" class="tab-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-users-cog"></i> 👤👁️ Gestion des Revendeurs</div>
+                    <div class="data-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID Revendeur</th>
+                                    <th>Crédits Jetons</th>
+                                    <th>Expiration</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resellersTableBody">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. VOIR LES JETONS -->
+            <div id="tab-manage-tokens" class="tab-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-list-check"></i> 🎟️👁️ Surveillance des Jetons</div>
+                    <div class="data-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Jeton / ID</th>
+                                    <th>Type</th>
+                                    <th>Créateur</th>
+                                    <th>Appareil (HWID)</th>
+                                    <th>Statut Connexion</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tokensTableBody">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. CONSUMMATION GO (ADMIN) -->
+            <div id="tab-stats" class="tab-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-chart-pie"></i> 🚀👁️ Consommation de Bandpass (Données Serveur)</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-terminal"></i></div>
+                            <div>
+                                <div class="stat-val" id="sshDataVal">20.4 Go</div>
+                                <div class="stat-lbl">Consommation SSH</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-tint"></i></div>
+                            <div>
+                                <div class="stat-val" id="v2rayDataVal">10.8 Go</div>
+                                <div class="stat-lbl">Consommation V2RAY</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-network-wired"></i></div>
+                            <div>
+                                <div class="stat-val" id="totalDataVal">31.2 Go</div>
+                                <div class="stat-lbl">Total Données Utilisées</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // INIT STORAGE IF EMPTY
+        const DEFAULT_DATA = {
+            resellers: [],
+            tokens: [],
+            sshConfig: {},
+            v2rayConfig: {},
+            stats: { sshGo: 20.4, v2rayGo: 10.8 }
+        };
+
+        function getDB() {
+            return JSON.parse(localStorage.getItem('SAGE_TUN_DB')) || DEFAULT_DATA;
+        }
+
+        function saveDB(db) {
+            localStorage.setItem('SAGE_TUN_DB', JSON.stringify(db));
+        }
+
+        let currentUser = null;
+
+        // AUTHENTICATION
+        function handleLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('loginId').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            const db = getDB();
+
+            if (id === 'ADMIN' && pass === 'admin123') {
+                currentUser = { role: 'ADMIN', id: 'ADMIN' };
+            } else {
+                const res = db.resellers.find(r => r.id === id && r.pass === pass && r.status === 'ACTIVE');
+                if (res) {
+                    currentUser = { role: 'RESELLER', id: res.id, data: res };
+                } else {
+                    alert('Identifiants incorrects ou compte suspendu !');
+                    return;
+                }
+            }
+
+            document.getElementById('loginModal').style.display = 'none';
+            setupUI();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function setupUI() {
+            document.getElementById('currentUserRole').innerText = currentUser.role + ' (' + currentUser.id + ')';
+            
+            // Masquer les onglets réservés aux Admins
+            const adminElements = document.querySelectorAll('.admin-only');
+            adminElements.forEach(el => {
+                el.style.display = (currentUser.role === 'ADMIN') ? 'flex' : 'none';
+            });
+
+            if (currentUser.role === 'RESELLER') {
+                switchTab('tab-create-token');
+                updateResellerQuotaDisplay();
+            } else {
+                switchTab('tab-config');
+            }
+            renderTables();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            const targetTab = document.getElementById(tabId);
+            if(targetTab) targetTab.classList.add('active');
+            
+            // Highlight nav
+            const navs = document.querySelectorAll('.nav-item');
+            navs.forEach(n => {
+                if(n.getAttribute('onclick') && n.getAttribute('onclick').includes(tabId)) {
+                    n.classList.add('active');
+                }
+            });
+        }
+
+        function updateResellerQuotaDisplay() {
+            if (currentUser.role === 'RESELLER') {
+                const db = getDB();
+                const res = db.resellers.find(r => r.id === currentUser.id);
+                if (res) {
+                    const used = db.tokens.filter(t => t.creator === res.id && t.type === 'PRIVATE').length;
+                    document.getElementById('resellerQuotaBadge').innerText = `N.B: limite de jetons ${used}/${res.tokenLimit} jetons`;
+                }
+            }
+        }
+
+        // GENERATION DES JETONS PRIVES
+        function generatePrivateToken(e) {
+            e.preventDefault();
+            const db = getDB();
+            const durationDays = parseInt(document.getElementById('tokenDuration').value);
+
+            if (currentUser.role === 'RESELLER') {
+                const res = db.resellers.find(r => r.id === currentUser.id);
+                const used = db.tokens.filter(t => t.creator === res.id && t.type === 'PRIVATE').length;
+                if (used >= res.tokenLimit) {
+                    alert('Limite de jetons atteinte ! Impossible d\'en ajouter plus.');
+                    return;
+                }
+            }
+
+            const randomCode = Math.floor(100000 + Math.random() * 900000);
+            const tokenCode = `SAGE-${randomCode}-CREDIT`;
+
+            const newToken = {
+                code: tokenCode,
+                type: 'PRIVATE',
+                creator: currentUser.id,
+                durationDays: durationDays,
+                hwid: null, // Verrouillage appareil unique lors de la première connexion
+                status: 'ACTIVE',
+                connected: false,
+                createdAt: new Date().toISOString()
+            };
+
+            db.tokens.push(newToken);
+            saveDB(db);
+
+            const ticket = `━━━━━━━━━━━━━━━━━━━━━\n🎟 JETONS 9999 CRÉDIT 🎟\n━━━━━━━━━━━━━━━━━━━━━\n${tokenCode}\n━━━━━━━━━━━━━━━━━━━━━`;
+            document.getElementById('ticketBoxText').innerText = ticket;
+            document.getElementById('tokenOutput').style.display = 'block';
+
+            updateResellerQuotaDisplay();
+            renderTables();
+        }
+
+        // GENERATION DES JETONS PUBLICS
+        function generatePublicToken(e) {
+            e.preventDefault();
+            const hours = parseInt(document.getElementById('publicHours').value);
+            const randomCode = Math.floor(100000 + Math.random() * 900000);
+            const tokenCode = `SAGE-${randomCode}-PUBLIC`;
+
+            const db = getDB();
+            const newToken = {
+                code: tokenCode,
+                type: 'PUBLIC',
+                creator: currentUser.id,
+                durationHours: hours,
+                hwid: null,
+                status: 'ACTIVE',
+                connected: false,
+                createdAt: new Date().toISOString()
+            };
+
+            db.tokens.push(newToken);
+            saveDB(db);
+
+            const ticket = `━━━━━━━━━━━━━━━━━━━━━\n🎟 JETON PUBLIC (${hours}H) 🎟\n━━━━━━━━━━━━━━━━━━━━━\n${tokenCode}\n━━━━━━━━━━━━━━━━━━━━━`;
+            document.getElementById('publicTicketBoxText').innerText = ticket;
+            document.getElementById('publicTokenOutput').style.display = 'block';
+
+            renderTables();
+        }
+
+        // CRÉATION DE REVENDEUR (ADMIN)
+        function createReseller(e) {
+            e.preventDefault();
+            const pass = document.getElementById('resellerPass').value;
+            const tokenLimit = document.getElementById('resellerTokenLimit').value;
+            const daysLimit = document.getElementById('resellerDaysLimit').value;
+
+            const randomId = 'SAGE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
+            const db = getDB();
+
+            const newReseller = {
+                id: randomId,
+                pass: pass,
+                tokenLimit: parseInt(tokenLimit),
+                daysLimit: parseInt(daysLimit),
+                status: 'ACTIVE',
+                createdAt: new Date().toISOString()
+            };
+
+            db.resellers.push(newReseller);
+            saveDB(db);
+
+            const domain = window.location.origin + window.location.pathname;
+            const ticket = `━━━━━━━━━━━━━━━━━━━━━\n 🎟 ACCES DES JETONS ${tokenLimit} 🎟\n━━━━━━━━━━━━━━━━━━━━━\nID: ${randomId}\n\nLIEN: ${domain}\n━━━━━━━━━━━━━━━━━━━━━`;
+
+            document.getElementById('resellerTicketText').innerText = ticket;
+            document.getElementById('resellerOutput').style.display = 'block';
+
+            renderTables();
+        }
+
+        // COPIER LES TEXTES
+        function copyTicket() { navigator.clipboard.writeText(document.getElementById('ticketBoxText').innerText); alert('Copié !'); }
+        function copyPublicTicket() { navigator.clipboard.writeText(document.getElementById('publicTicketBoxText').innerText); alert('Copié !'); }
+        function copyResellerTicket() { navigator.clipboard.writeText(document.getElementById('resellerTicketText').innerText); alert('Copié !'); }
+
+        // AFFICHAGE DES TABLEAUX
+        function renderTables() {
+            const db = getDB();
+
+            // Table Revendeurs
+            const resTable = document.getElementById('resellersTableBody');
+            if (resTable) {
+                resTable.innerHTML = '';
+                db.resellers.forEach(r => {
+                    const used = db.tokens.filter(t => t.creator === r.id).length;
+                    resTable.innerHTML += `
+                        <tr>
+                            <td><b>${r.id}</b></td>
+                            <td>${used} / ${r.tokenLimit}</td>
+                            <td>${r.daysLimit} Jours</td>
+                            <td><span class="badge ${r.status === 'ACTIVE' ? 'badge-success' : 'badge-danger'}">${r.status}</span></td>
+                            <td>
+                                <button onclick="toggleResellerStatus('${r.id}')" class="btn btn-warning" style="padding: 4px 8px; font-size: 0.75rem;"><i class="fas fa-pause"></i> Stop/Start</button>
+                                <button onclick="deleteReseller('${r.id}')" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem;"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Table Jetons
+            const tokenTable = document.getElementById('tokensTableBody');
+            if (tokenTable) {
+                tokenTable.innerHTML = '';
+                const filteredTokens = (currentUser.role === 'ADMIN') ? db.tokens : db.tokens.filter(t => t.creator === currentUser.id);
+                
+                filteredTokens.forEach(t => {
+                    tokenTable.innerHTML += `
+                        <tr>
+                            <td><b>${t.code}</b></td>
+                            <td>${t.type}</td>
+                            <td>${t.creator}</td>
+                            <td>${t.hwid ? t.hwid : '<i style="color:gray;">Non lié (1er appareil)</i>'}</td>
+                            <td><span class="badge ${t.connected ? 'badge-success' : 'badge-danger'}">${t.connected ? 'En ligne' : 'Hors ligne'}</span></td>
+                            <td>
+                                <button onclick="revokeToken('${t.code}')" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem;"><i class="fas fa-ban"></i> Couper / Supprimer</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function toggleResellerStatus(id) {
+            const db = getDB();
+            const r = db.resellers.find(res => res.id === id);
+            if (r) {
+                r.status = (r.status === 'ACTIVE') ? 'STOPPED' : 'ACTIVE';
+                saveDB(db);
+                renderTables();
+            }
+        }
+
+        function deleteReseller(id) {
+            if (!confirm('Supprimer ce revendeur ?')) return;
+            let db = getDB();
+            db.resellers = db.resellers.filter(r => r.id !== id);
+            saveDB(db);
+            renderTables();
+        }
+
+        function revokeToken(code) {
+            let db = getDB();
+            db.tokens = db.tokens.filter(t => t.code !== code);
+            saveDB(db);
+            renderTables();
+            updateResellerQuotaDisplay();
+        }
+
+        // SAUVEGARDE CONFIGURATIONS
+        function saveSshConfig(e) {
+            e.preventDefault();
+            const db = getDB();
+            db.sshConfig = {
+                type: document.getElementById('sshType').value,
+                name: document.getElementById('sshName').value,
+                pass: document.getElementById('sshPass').value,
+                host: document.getElementById('sshHost').value,
+                port: document.getElementById('sshPort').value,
+                udpgwPort: document.getElementById('sshUdpgwPort').value,
+                payload: document.getElementById('sshPayload').value,
+                proxy: document.getElementById('sshProxy').value,
+                sni: document.getElementById('sshSni').value,
+                dns: document.getElementById('sshDns').value,
+                udpgw: document.getElementById('sshUdpgw').value,
+                tls: document.getElementById('sshTls').value,
+                autoPing: document.getElementById('sshAutoPing').checked
+            };
+            saveDB(db);
+            alert('Configuration SSH sauvegardée avec succès ! L\'application SAGE TUN synchronisera ces données.');
+        }
+
+        function saveV2rayConfig(e) {
+            e.preventDefault();
+            const db = getDB();
+            db.v2rayConfig = {
+                type: document.getElementById('v2rayType').value,
+                json: document.getElementById('v2rayJson').value
+            };
+            saveDB(db);
+            alert('Configuration V2Ray sauvegardée !');
+        }
+    </script>
+</body>
+</html>
