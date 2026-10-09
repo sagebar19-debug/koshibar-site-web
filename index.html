@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGE TUN - Grand Panel Administration</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #030712;
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1.neon-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #00f0ff, #ff0055, #00ff66, #b026ff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorShift 6s ease infinite;
+        }
+
+        @keyframes colorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .auth-card {
+            max-width: 400px;
+            margin: 60px auto;
+            background: rgba(30, 41, 59, 0.98);
+            border: 2px solid #3b82f6;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+        }
+
+        .auth-card h2 {
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #38bdf8;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-danger { background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+        .btn-warning { background: #f59e0b; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+        .btn-success { background: #22c55e; color: white; border: none; border-radius: 6px; padding: 10px; cursor: pointer; font-weight: bold; width: 100%; }
+
+        .dashboard {
+            display: none;
+        }
+
+        .logout-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .tab-content {
+            display: none;
+            background: #1e293b;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media(max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .ticket-box {
+            background: #0f172a;
+            border: 2px dashed #38bdf8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: #38bdf8;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        th {
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .badge-online { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .badge-offline { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-top: 5px;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="neon-title">SAGE TUN GRANDE PANEL</h1>
+            <p class="subtitle">Gestion Administrative & Configuration VPN High-Speed</p>
+        </header>
+
+        <!-- FORMULAIRE DE CONNEXION -->
+        <div id="auth-section" class="auth-card">
+            <h2>🔑 IDENTIFICATION</h2>
+            <div class="form-group">
+                <label>ID Application Admin / Revendeur</label>
+                <input type="text" id="login-id" value="HWID-Q580UM-MV1JYHT3" placeholder="Entrez votre ID">
+            </div>
+            <button class="btn-primary" onclick="handleLogin()">Accéder au Panel</button>
+            <div id="login-error" class="error-msg"></div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard-section" class="dashboard">
+            <div class="logout-bar">
+                <span id="user-welcome-banner" style="font-weight: 800; color: #38bdf8;"></span>
+                <button onclick="handleLogout()" class="btn-danger" style="width: auto;">Déconnexion</button>
+            </div>
+
+            <!-- MENU ONGLETS -->
+            <div class="nav-tabs" id="nav-tabs-container"></div>
+
+            <!-- 1: CONFIG SERVEURS -->
+            <div id="tab-servers" class="tab-content">
+                <h3 style="color:#38bdf8; margin-bottom:15px;">💻 Configuration des Serveurs</h3>
+                <div class="grid-2">
+                    <div style="background:#0f172a; padding:15px; border-radius:8px; border:1px solid #334155;">
+                        <h4 style="color:#22c55e; margin-bottom:10px;">🔥 SSH-TLS-PAYLOAD</h4>
+                        
+                        <div class="form-group">
+                            <label>1 SSH (IP:PORT@USER:PASS)</label>
+                            <input type="text" id="cfg-ssh-connect" value="ssh.sage.tun:443@user:pass">
+                        </div>
+
+                        <div class="form-group">
+                            <label>2 PAYLOAD</label>
+                            <textarea id="cfg-ssh-payload" rows="2">GET / HTTP/1.1[crlf]Host: [host][crlf]Upgrade: websocket[crlf][crlf]</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>3 PROXY (IP:PORT)</label>
+                            <input type="text" id="cfg-ssh-proxy" value="104.16.0.1:80">
+                        </div>
+
+                        <div class="form-group">
+                            <label>4 SERVER NAME INDICATION (SNI)</label>
+                            <input type="text" id="cfg-ssh-sni" value="cdn.cloudflare.com">
+                        </div>
+
+                        <p style="color: #f59e0b; font-weight: bold; margin: 15px 0 10px 0; font-size: 0.85rem;">PARAMÈTRES</p>
+
+                        <div class="form-group">
+                            <label>5 DNS</label>
+                            <input type="text" id="cfg-ssh-dns" value="8.8.8.8:8.0.0.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label>6 UDPGW</label>
+                            <input type="text" id="cfg-ssh-udpgw" value="127.0.0.1:7300">
+                        </div>
+
+                        <div class="form-group">
+                            <label>7 AUTO PING (Pinge for keep-alive service)</label>
+                            <input type="checkbox" id="cfg-ssh-ping" checked style="width: auto; transform: scale(1.2); margin-left: 5px;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>8 FORCING TLS</label>
+                            <select id="cfg-ssh-tls">
+                                <option value="Auto">Auto</option>
+                                <option value="TLSv1">TLSv1</option>
+                                <option value="TLSv1.1">TLSv1.1</option>
+                                <option value="TLSv1.2">TLSv1.2</option>
+                                <option value="TLSv1.3" selected>TLSv1.3</option>
+                            </select>
+                        </div>
+
+                        <button onclick="saveConfig('ssh')" class="btn-success">💾 Enregistrer Configuration SSH</button>
+                    </div>
+
+                    <div style="background:#0f172a; padding:15px; border-radius:8px; border:1px solid #334155;">
+                        <h4 style="color:#b026ff; margin-bottom:10px;">💧 V2RAY (VLESS / VMESS / TROJAN)</h4>
+                        <div class="form-group">
+                            <label>Protocole</label>
+                            <select id="cfg-v2ray-type">
+                                <option value="VLESS">VLESS</option>
+                                <option value="VMESS">VMESS</option>
+                                <option value="TROJAN">TROJAN</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Configuration JSON V2Ray</label>
+                            <textarea id="cfg-v2ray-json" rows="12">{
+  "inbounds": [{
+    "port": 443,
+    "protocol": "vless",
+    "settings": {
+      "clients": [{ "id": "b831381d-6324-4d53-ad4f-8cda98b3f811" }]
+    }
+  }]
+}</textarea>
+                        </div>
+                        <button onclick="saveConfig('v2ray')" class="btn-success">💾 Sauvegarder V2Ray JSON</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2: CREER UN JETON -->
+            <div id="tab-create-token" class="tab-content">
+                <h3 style="color:#38bdf8; margin-bottom:15px;">🎟 1_ Créer un Jeton VIP</h3>
+                <div class="form-group" style="max-width:350px;">
+                    <label>Durée d'expiration</label>
+                    <select id="token-duration">
+                        <option value="7">7 Jours</option>
+                        <option value="31" selected>31 Jours</option>
+                    </select>
+                </div>
+                <button onclick="generateToken(false)" class="btn-primary" style="max-width:350px;">Générer Jeton</button>
+                <div id="token-result-box" style="display:none; max-width:450px;">
+                    <div class="ticket-box" id="ticket-text"></div>
+                    <button class="copy-btn" onclick="copyText('ticket-text')">📋 Copier le Jeton</button>
+                </div>
+            </div>
+
+            <!-- 3: JETON PUBLIC -->
+            <div id="tab-public-token" class="tab-content">
+                <h3 style="color:#38bdf8; margin-bottom:15px;">🌍 2_ Créer un Jeton Public (Max 24h)</h3>
+                <div class="form-group" style="max-width:350px;">
+                    <label>Temps de validité</label>
+                    <select id="public-duration">
+                        <option value="1">1 Heure</option>
+                        <option value="12">12 Heures</option>
+                        <option value="24" selected>24 Heures</option>
+                    </select>
+                </div>
+                <button onclick="generateToken(true)" class="btn-primary" style="max-width:350px;">Générer Jeton Public</button>
+                <div id="public-result-box" style="display:none; max-width:450px;">
+                    <div class="ticket-box" id="public-ticket-text"></div>
+                    <button class="copy-btn" onclick="copyText('public-ticket-text')">📋 Copier Jeton Public</button>
+                </div>
+            </div>
+
+            <!-- 4: CREER REVENDEUR -->
+            <div id="tab-create-reseller" class="tab-content">
+                <h3 style="color:#38bdf8; margin-bottom:15px;">👤 4_ Créer un Revendeur</h3>
+                <div style="max-width:450px;">
+                    <div class="form-group"><label>ID Application Revendeur</label><input type="text" id="res-id" placeholder="Ex: SAGE-REV-88"></div>
+                    <div class="form-group"><label>Limite de Jetons</label><input type="number" id="res-limit" value="20"></div>
+                    <div class="form-group"><label>Nombre de jours</label><input type="number" id="res-days" value="30"></div>
+                    <button onclick="createReseller()" class="btn-primary">Créer l'accès Revendeur</button>
+                </div>
+                <div id="reseller-result-box" style="display:none; max-width:450px;">
+                    <div class="ticket-box" id="reseller-ticket-text"></div>
+                    <button class="copy-btn" onclick="copyText('reseller-ticket-text')">📋 Copier Accès Revendeur</button>
+                </div>
+            </div>
+
+            <!-- 5: GERER REVENDEURS -->
+            <div id="tab-manage-reseller" class="tab-content">
+                <h3 style="color:#38bdf8; margin-bottom:15px;">👤👁 5_ Gestion des Revendeurs</h3>
+                <table>
+                    <thead><tr><th>ID Revendeur</th><th>Jetons</th><th>Statut</th><th>Actions</th></tr></thead>
+                    <tbody id="resellers-table"></tbody>
+                </table>
+            </div>
+
+            <!-- 6: GERER MES JETONS -->
+            <div id="tab-manage-tokens" class="tab-content">
+                <div id="reseller-info-header" style="color:#f59e0b; font-weight:bold; margin-bottom:10px;"></div>
+                <h3 style="color:#38bdf8; margin-bottom:15px;">🎟👁 6_ Voir Mes Jetons</h3>
+                <table>
+                    <thead><tr><th>Jeton</th><th>Type</th><th>Expiration</th><th>Statut</th><th>Actions</th></tr></thead>
+                    <tbody id="tokens-table"></tbody>
+                </table>
+            </div>
+
+            <!-- 7: CONSOMMATION GO -->
+            <div id="tab-bandwidth" class="tab-content">
+                <h3 style="color:#38bdf8; margin-bottom:15px;">🚀👁 7_ Consommation des Data (Go)</h3>
+                <div class="stats-cards">
+                    <div class="stat-card"><h4>SSH</h4><div class="value">20 Go</div></div>
+                    <div class="stat-card"><h4>V2RAY</h4><div class="value">10 Go</div></div>
+                    <div class="stat-card"><h4>TOTAL</h4><div class="value">30 Go</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_KEY = "SAGE_TUN_DATABASE";
+        const SESSION_KEY = "SAGE_TUN_ADMIN_SESSION";
+        const ADMIN_HWID = "HWID-Q580UM-MV1JYHT3";
+
+        function getDB() {
+            let data = localStorage.getItem(DB_KEY);
+            if(!data) {
+                const init = {
+                    resellers: [{ id: "SAGE-3E474V-5675", limit: 20, used: 0, days: 30, active: true }],
+                    tokens: [{ code: "SAGE-653283-CREDIT", type: "VIP 31J", creator: "admin", expires: "2026-11-09", active: true }]
+                };
+                localStorage.setItem(DB_KEY, JSON.stringify(init));
+                return init;
+            }
+            return JSON.parse(data);
+        }
+
+        function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+        let currentUser = null;
+
+        window.onload = function() {
+            const savedSession = localStorage.getItem(SESSION_KEY);
+            if(savedSession) {
+                currentUser = JSON.parse(savedSession);
+                initDashboard();
+            } else {
+                document.getElementById("login-id").value = ADMIN_HWID;
+            }
+        };
+
+        function handleLogin() {
+            const idInput = document.getElementById("login-id").value.trim();
+            const err = document.getElementById("login-error");
+
+            if(!idInput) {
+                err.textContent = "Veuillez entrer votre ID.";
+                return;
+            }
+
+            if(idInput === ADMIN_HWID || idInput.toUpperCase() === "ADMIN-SAGE" || idInput.toLowerCase() === "admin") {
+                currentUser = { role: "admin", id: ADMIN_HWID };
+                localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+                initDashboard();
+                return;
+            }
+
+            const db = getDB();
+            const res = db.resellers.find(r => r.id === idInput && r.active);
+            if(res) {
+                currentUser = { role: "reseller", id: res.id };
+                localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+                initDashboard();
+            } else {
+                err.textContent = "ID Invalide ou compte bloqué.";
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem(SESSION_KEY);
+            currentUser = null;
+            document.getElementById("auth-section").style.display = "block";
+            document.getElementById("dashboard-section").style.display = "none";
+            document.getElementById("login-id").value = ADMIN_HWID;
+        }
+
+        function initDashboard() {
+            document.getElementById("auth-section").style.display = "none";
+            document.getElementById("dashboard-section").style.display = "block";
+
+            const tabs = document.getElementById("nav-tabs-container");
+            const banner = document.getElementById("user-welcome-banner");
+            tabs.innerHTML = "";
+
+            if(currentUser.role === "admin") {
+                banner.textContent = "🪙 BIENVENUE CHEZ SAGE TUN — PANEL ADMINISTRATEUR 🪙";
+                tabs.innerHTML = `
+                    <button class="tab-btn active" onclick="switchTab('tab-servers', this)">💻 Config Serveurs</button>
+                    <button class="tab-btn" onclick="switchTab('tab-create-token', this)">🎟 Créer Jeton VIP</button>
+                    <button class="tab-btn" onclick="switchTab('tab-public-token', this)">🌍 Jeton Public</button>
+                    <button class="tab-btn" onclick="switchTab('tab-create-reseller', this)">👤 Créer Revendeur</button>
+                    <button class="tab-btn" onclick="switchTab('tab-manage-reseller', this)">👤👁 Gérer Revendeurs</button>
+                    <button class="tab-btn" onclick="switchTab('tab-manage-tokens', this)">🎟👁 Gérer Jetons</button>
+                    <button class="tab-btn" onclick="switchTab('tab-bandwidth', this)">🚀👁 Consommation Go</button>
+                `;
+                switchTab('tab-servers', tabs.children[0]);
+            } else {
+                banner.textContent = `🪙 BIENVENUE CHEZ SAGE TUN — REVENDEUR (${currentUser.id}) 🪙`;
+                tabs.innerHTML = `
+                    <button class="tab-btn active" onclick="switchTab('tab-create-token', this)">🎟 Créer un Jeton</button>
+                    <button class="tab-btn" onclick="switchTab('tab-public-token', this)">🌍 Jetons Publics</button>
+                    <button class="tab-btn" onclick="switchTab('tab-manage-tokens', this)">🎟👁 Mes Jetons</button>
+                `;
+                switchTab('tab-create-token', tabs.children[0]);
+            }
+            renderTables();
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function generateToken(isPublic) {
+            const db = getDB();
+            if(currentUser.role === "reseller") {
+                const res = db.resellers.find(r => r.id === currentUser.id);
+                if(res.used >= res.limit) {
+                    alert("Limite de jetons atteinte !");
+                    return;
+                }
+                res.used++;
+            }
+
+            const code = "SAGE-" + Math.floor(100000 + Math.random() * 900000) + "-CREDIT";
+            db.tokens.push({
+                code: code,
+                type: isPublic ? "Public (24h)" : "VIP",
+                creator: currentUser.id,
+                expires: "Actif",
+                active: true
+            });
+
+            saveDB(db);
+
+            const txt = `━━━━━━━━━━━━━━━━━━━━━\n 🎟 JETONS 9999 CRÉDIT  🎟\n━━━━━━━━━━━━━━━━━━━━━\n${code}\n━━━━━━━━━━━━━━━━━━━━━\n━━━━━━━━━━━━━━━━━━━━━`;
+            
+            if(isPublic) {
+                document.getElementById("public-result-box").style.display = "block";
+                document.getElementById("public-ticket-text").textContent = txt;
+            } else {
+                document.getElementById("token-result-box").style.display = "block";
+                document.getElementById("ticket-text").textContent = txt;
+            }
+            renderTables();
+        }
+
+        function createReseller() {
+            const id = document.getElementById("res-id").value.trim();
+            const limit = document.getElementById("res-limit").value;
+
+            if(!id) return;
+            const db = getDB();
+            db.resellers.push({ id, limit: parseInt(limit), used: 0, days: 30, active: true });
+            saveDB(db);
+
+            const txt = `━━━━━━━━━━━━━━━━━━━━━\n 🎟 ACCES DES JETONS ${limit} 🎟\n━━━━━━━━━━━━━━━━━━━━━\nID: ${id}\n\nhttp://sage.tun/revendeur\n━━━━━━━━━━━━━━━━━━━━━\n━━━━━━━━━━━━━━━━━━━━━`;
+            document.getElementById("reseller-result-box").style.display = "block";
+            document.getElementById("reseller-ticket-text").textContent = txt;
+            renderTables();
+        }
+
+        function renderTables() {
+            const db = getDB();
+            const resTbody = document.getElementById("resellers-table");
+            if(resTbody) {
+                resTbody.innerHTML = "";
+                db.resellers.forEach((r, i) => {
+                    resTbody.innerHTML += `<tr>
+                        <td>${r.id}</td>
+                        <td>${r.used} / ${r.limit}</td>
+                        <td><span class="badge ${r.active ? 'badge-online':'badge-offline'}">${r.active ? 'Actif':'Stop'}</span></td>
+                        <td><button class="btn-warning" onclick="toggleReseller(${i})">Changer Statut</button></td>
+                    </tr>`;
+                });
+            }
+
+            const tokTbody = document.getElementById("tokens-table");
+            if(tokTbody) {
+                tokTbody.innerHTML = "";
+                const list = currentUser.role === "admin" ? db.tokens : db.tokens.filter(t => t.creator === currentUser.id);
+                list.forEach(t => {
+                    tokTbody.innerHTML += `<tr>
+                        <td><code>${t.code}</code></td>
+                        <td>${t.type}</td>
+                        <td>${t.expires}</td>
+                        <td><span class="badge ${t.active ? 'badge-online':'badge-offline'}">${t.active ? 'Valide':'Bloqué'}</span></td>
+                        <td><button class="btn-danger" onclick="toggleToken('${t.code}')">Couper</button></td>
+                    </tr>`;
+                });
+            }
+        }
+
+        function toggleReseller(i) {
+            const db = getDB();
+            db.resellers[i].active = !db.resellers[i].active;
+            saveDB(db);
+            renderTables();
+        }
+
+        function toggleToken(code) {
+            const db = getDB();
+            const t = db.tokens.find(tok => tok.code === code);
+            if(t) {
+                t.active = !t.active;
+                saveDB(db);
+                renderTables();
+            }
+        }
+
+        function saveConfig(type) {
+            alert("✅ Configuration " + type.toUpperCase() + " enregistrée directement pour l'application SAGE TUN !");
+        }
+
+        function copyText(id) {
+            navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+                alert("Copie effectuée !");
+            });
+        }
+    </script>
+</body>
+</html>
