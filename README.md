@@ -1,4 +1,4 @@
-# KOSHIBAR-SITE WEB 😉
+# KOSHIBAR-PANEL WEB 😉
 
 Panel pour l'apk SAGE TUN :
 
